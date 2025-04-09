@@ -1,7 +1,10 @@
+import PrivateRoute from "./Private/Private";
+
 const Home =() => {
     return (
         <div>
-        <h1>Home</h1>
+            <PrivateRoute> <h1>Home</h1></PrivateRoute>
+       
         </div>
     );
     };

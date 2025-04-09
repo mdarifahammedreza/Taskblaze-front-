@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import { default as Kanban } from './components/Dashboard/Kanban';
 import Authnication from './Pages/Authnication';
 import Chat from './Pages/Chat';
+import PrivateRoute from './Pages/Private/Private';
 import ServerStatus from './Pages/Private/ServerStatus';
 import Root from './Root';
 
@@ -22,7 +23,7 @@ let router = createBrowserRouter([
       },
       {
         path: '/kanban',
-        element: <Kanban />,
+        element: <PrivateRoute><Kanban /></PrivateRoute>,
       },
       {
         path: '/ChatContainer',
