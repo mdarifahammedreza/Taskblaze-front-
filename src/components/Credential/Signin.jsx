@@ -2,50 +2,69 @@
 import {
   IconBrandFacebook,
   IconBrandGithub,
-  IconBrandGoogle
+  IconBrandGoogle,
 } from "@tabler/icons-react";
-import React from "react";
+import React, { useContext } from "react";
+import { useLocation, useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
-import { cn } from '../../../lib/utils';
-import { signInWithEmail } from "../../Pages/Private/Auth";
+import { cn } from "../../../lib/utils";
+import { signInWithEmail, signInWithGoogle } from "../../Pages/Private/Auth";
+import { UserContext } from "../../Pages/Private/AuthProvider";
 import { Input } from "../UI/input";
 import { Label } from "../UI/label";
 
 export default function Signin() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+  const { login } = useContext(UserContext);
+
+  const HandleUser = (user) => {
+    login(user);
+
+    if (user) {
+      toast.success("Successfully signed in!");
+      navigate(from, { replace: true });
+       // Reset form after successful login
+    } else {
+      toast.error("Invalid email or password!");
+    }
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const email = e.target.email.value;
     const password = e.target.password.value;
-  
+
     try {
       const status = await signInWithEmail(email, password);
-      console.log(status);
-  
-      if (status === true) {
-        toast.success("Successfully signed in!");
-        e.target.reset(); // Reset form after successful login
-      } else {
-        toast.error("Invalid email or password!");
-      }
+      // console.log(status);
+      HandleUser(status);
+      e.target.reset();
     } catch (error) {
       console.error("Sign-in error:", error);
       toast.error("Something went wrong. Please try again.");
     }
   };
-  
-const GoogleLogin = () => {
-  // Implement Google login logic here
-  toast.success("Google login successful!");
-}
-const FacebookLogin = () => {
-  // Implement Facebook login logic here
-  toast.success("Facebook login successful!");
-}
-const GithubLogin = () => {
-  // Implement Github login logic here
-  toast.success("Github login successful!");
-}
+
+  const GoogleLogin = async() => {
+    const status =await signInWithGoogle();
+    // Implement Google login logic here
+    HandleUser(status);
+  };
+  const FacebookLogin = async() => {
+    toast.info("Facebook login is Pending for Meta permission.");
+    // Implement Facebook login logic here
+    // HandleUser(status);
+  };
+  const GithubLogin = async() => {
+    toast.info("GitHub login is Under maintenance .");
+    // const status = signInWithGithub();
+    // // Implement GitHub login logic here
+    // HandleUser(status);
+  };
   return (
     <div className="shadow-input mx-auto w-full rounded-none p-4 md:rounded-2xl md:p-8 bg-gray-900 text-neutral-200">
       <h2 className="text-xl font-bold text-neutral-200">
@@ -56,17 +75,32 @@ const GithubLogin = () => {
       </p>
       <form className="my-8" onSubmit={handleSubmit}>
         <LabelInputContainer className="mb-4">
-          <Label className="text-white" htmlFor="email">Email Address</Label>
-          <Input id="email" placeholder="you@example.com" type="email" required  />
+          <Label className="text-white" htmlFor="email">
+            Email Address
+          </Label>
+          <Input
+            id="email"
+            placeholder="you@example.com"
+            type="email"
+            required
+          />
         </LabelInputContainer>
         <LabelInputContainer className="mb-8">
-          <Label className="text-white" htmlFor="password">Password</Label>
-          <Input id="password" placeholder="••••••••" type="password" required  />
+          <Label className="text-white" htmlFor="password">
+            Password
+          </Label>
+          <Input
+            id="password"
+            placeholder="••••••••"
+            type="password"
+            required
+          />
         </LabelInputContainer>
 
         <button
           className="group/btn relative block h-10 w-full rounded-md bg-sky-400 from-sky-500 to-sky-600 shadow-[0px_1px_0px_0px_#1a202c_inset,0px_-1px_0px_0px_#1a202c_inset] font-semibold"
-          type="submit">
+          type="submit"
+        >
           Log in &rarr;
           <BottomGradient />
         </button>
@@ -74,9 +108,21 @@ const GithubLogin = () => {
         <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent to-transparent via-neutral-700" />
 
         <div className="flex flex-col space-y-4">
-          <OAuthButton icon={IconBrandFacebook} text="Facebook" funtion={FacebookLogin}/>
-          <OAuthButton icon={IconBrandGoogle} text="Google" funtion = {GoogleLogin} />
-          <OAuthButton icon={IconBrandGithub} text="Github" funtion = {GithubLogin} />
+          <OAuthButton
+            icon={IconBrandFacebook}
+            text="Facebook"
+            funtion={FacebookLogin}
+          />
+          <OAuthButton
+            icon={IconBrandGoogle}
+            text="Google"
+            funtion={GoogleLogin}
+          />
+          <OAuthButton
+            icon={IconBrandGithub}
+            text="Github"
+            funtion={GithubLogin}
+          />
         </div>
       </form>
       <ToastContainer />
@@ -84,12 +130,12 @@ const GithubLogin = () => {
   );
 }
 
-const OAuthButton = ({ icon: Icon, text,funtion }) => (
+const OAuthButton = ({ icon: Icon, text, funtion }) => (
   <button
     className="group/btn relative flex h-10 w-full items-center justify-start space-x-2 rounded-md px-4 font-medium text-white bg-zinc-900 shadow-[0px_0px_1px_1px_#262626]"
     type="submit"
-    onClick={()=>funtion()}>
-  
+    onClick={() => funtion()}
+  >
     <Icon className="h-4 w-4 text-neutral-300" />
     <span className="text-sm text-neutral-300">{text}</span>
     <BottomGradient />

@@ -6,11 +6,21 @@ export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // On mount, check if user exists in localStorage
+  // Load user from localStorage on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) setUser(JSON.parse(storedUser));
+    try {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    } catch (err) {
+      console.error("Error parsing user from localStorage:", err);
+      localStorage.removeItem("user");
+    } finally {
+      setLoading(false); // Finished loading user data
+    }
   }, []);
 
   const login = (userData) => {
@@ -23,11 +33,28 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem("user");
   };
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          flexDirection: "column",
+        }}
+      >
+        {/* Loading spinner with Taskblaze text */}
+        <div className="spinner-container">
+          <div className="spinner-text">Taskblaze</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <UserContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </UserContext.Provider>
   );
 };
-
-

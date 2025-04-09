@@ -4,22 +4,39 @@ import {
   IconBrandGithub,
   IconBrandGoogle
 } from "@tabler/icons-react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
 import { cn } from "../../../lib/utils";
 import {
+  signInWithGoogle,
   signUpWithEmail
 } from "../../Pages/Private/Auth";
+import { UserContext } from "../../Pages/Private/AuthProvider";
 import { Input } from "../UI/input";
 import { Label } from "../UI/label";
-
 export default function SignUp() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [reEnterPassword, setReEnterPassword] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+  const { login } = useContext(UserContext);
 
+  const HandleUser = (user) => {
+    login(user);
+
+    if (user) {
+      toast.success("Successfully signed in!");
+      navigate(from, { replace: true });
+       // Reset form after successful login
+    } else {
+      toast.error("Invalid email or password!");
+    }
+  };
   const [errors, setErrors] = useState({
     firstName: '',
     lastName: '',
@@ -90,24 +107,28 @@ export default function SignUp() {
     return formIsValid;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
 
     if (validateForm()) {
-      signUpWithEmail(email, password);
+     const User= await signUpWithEmail(email, password);
       toast.success("Successfully signed up!");
+      HandleUser(User)
     } else {
       toast.error("Please fill in all the fields correctly.");
     }
   };
-  const GoogleSignin = ()=>{
-    toast.error("Google login is not implemented yet.");
+ 
+  const GoogleSignin = async()=>{
+    const status =await signInWithGoogle();
+    // Implement Google login logic here
+    HandleUser(status);
   }
   const FacebookSignin = ()=>{
-    toast.error("Facebook login is not implemented yet.");
+    toast.info("Facebook login is Pending for Meta permission.");
   }
   const GithubSignin = ()=>{
-    toast.error("Github login is not implemented yet.");
+    toast.info("GitHub login is Under maintenance .");
   }
    return (
     <div className="shadow-input mx-auto w-full rounded-none p-4 md:rounded-2xl md:p-8 bg-gray-900 text-neutral-200">

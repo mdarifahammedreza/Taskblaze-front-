@@ -25,11 +25,13 @@ const handleError = (error) => {
 export const signInWithFacebook = async () => {
   try {
     const result = await signInWithPopup(auth, facebookProvider);
+    console.log('Facebook Sign-in Result: ', result);
     const user = result.user;
     console.log('User Info: ', user);
-    const credential = FacebookAuthProvider.credentialFromResult(result);
-    const accessToken = credential.accessToken;
-    console.log('Access Token: ', accessToken);
+    // const credential = FacebookAuthProvider.credentialFromResult(result);
+    // const accessToken = credential.accessToken;
+    // console.log('Access Token: ', accessToken);
+    return user;
   } catch (error) {
     handleError(error);
   }
@@ -40,10 +42,11 @@ export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
-    console.log('User Info: ', user);
+    // console.log('User Info: ', user);
     const credential = GoogleAuthProvider.credentialFromResult(result);
     const token = credential.accessToken;
-    console.log('Access Token: ', token);
+    // console.log('Access Token: ', token);
+    return user;
   } catch (error) {
     handleError(error);
   }
@@ -54,10 +57,11 @@ export const signInWithGithub = async () => {
   try {
     const result = await signInWithPopup(auth, githubProvider);
     const user = result.user;
-    console.log('User Info: ', user);
+    // console.log('User Info: ', user);
     const credential = GithubAuthProvider.credentialFromResult(result);
     const token = credential.accessToken;
-    console.log('GitHub Access Token: ', token);
+    return user;
+    // console.log('GitHub Access Token: ', token);
   } catch (error) {
     handleError(error);
   }
@@ -69,7 +73,7 @@ export const signUpWithEmail = async (email, password) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     console.log('Signed up successfully: ', user);
-    return true;
+    return user;
   } catch (error) {
     handleError(error);
     return false;
@@ -82,7 +86,7 @@ export const signInWithEmail = async (email, password) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     console.log('Signed in successfully: ', user);
-    return true;
+    return user;
   } catch (error) {
     handleError(error);
     return false;
