@@ -7,6 +7,9 @@ import { UserContext } from "../../Pages/Private/AuthProvider";
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user,logout } = useContext(UserContext);
+  // console.log(user
+  // uid
+  // );
 console.log(user?.photoURL);
   const  handlelogout = () => {
     logout();

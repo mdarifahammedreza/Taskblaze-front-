@@ -5,7 +5,6 @@ import { io } from 'socket.io-client';
 // Initialize socket connection to the server
 const socket = io('http://localhost:5000');
 
-
 const useSocket = () => {
   const [messages, setMessages] = useState([]);
   const [room, setRoom] = useState(null);
@@ -25,24 +24,26 @@ const useSocket = () => {
   };
 
   // Function to send a message
-  const sendMessage = (roomId, message) => {
-    const messageData = { roomId, message };
+  const sendMessage = (roomId, message, user) => {
+    const messageData = { roomId, message, user }; // Include user information
     socket.emit('sendMessage', messageData);
-    console.log(`Message sent to room ${roomId}: ${message}`);
+    console.log(`Message sent to room ${roomId} by ${user}: ${message}`);
   };
+  
 
   // Listen for incoming messages
   useEffect(() => {
-    socket.on('receiveMessage', (message) => {
-      console.log('New message received:', message);
-      setMessages((prevMessages) => [...prevMessages, message]);
+    socket.on('receiveMessage', (messageData) => {
+      console.log('New message received:', messageData);
+      setMessages((prevMessages) => [...prevMessages, messageData]); // Add the message with user data
     });
-
+  
     // Cleanup on unmount
     return () => {
       socket.off('receiveMessage');
     };
   }, []);
+  
 
   // Function to create a room (either group or 1-to-1)
   const createRoom = (roomId, userId) => {

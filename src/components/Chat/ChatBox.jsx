@@ -39,6 +39,7 @@ export default function ChatBox({
             }`}
           >
             {msg.sender === "ai" && <FaRobot className="text-cyan-400" />}
+            {msg.sender === "sender" && <FaUser className="text-cyan-400" />}
             <div
               className={`px-4 py-2 rounded-lg max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg animate-fade-in ${
                 msg.sender === "user"

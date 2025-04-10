@@ -1,19 +1,64 @@
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import ChatBox from "./ChatBox";
+import useSocket from "./Socket";
 import { TextGenerateEffect } from "./Text-Generate-Effect";
-
+import { UserContext } from "../../Pages/Private/AuthProvider";
 export default function ChatUI() {
+  const { user } = useContext(UserContext);
+  useEffect(() => {
+    if (user) {
+      setUserId(user.uid);
+    }
+  }, [user]);
+
+  // Socket Function Information
+  const {
+    messages: socketMessages,
+    room,
+    joinRoom,
+    leaveRoom,
+    sendMessage: socketsendMessage,
+    createRoom,
+  } = useSocket();
+
+  // ChatBox message Function Information
   const [messages, setMessages] = useState([
     { sender: "ai", text: "Hello! How can I assist you today?" },
   ]);
-  const [input, setInput] = useState("");
-  const [typing, setTyping] = useState(false);
 
-  const sendMessage = async (text) => {
+  const [input, setInput] = useState(""); // Message input from UI
+  const [typing, setTyping] = useState(false); // Handle Typing Effect in ChatUI
+  const [roomId, setRoomId] = useState(""); // Room ID for socket connection
+  const [userId, setUserId] = useState(""); // User ID for socket connection
+  // Message input from UI
+
+  // Socket IO function to handle sending messages
+  const handleSendMessage = (text) => {
+    setMessages((prev) => [...prev, { sender: "user", text }]);
+    setInput("");
+    setTyping(true);
+    socketsendMessage(room, text, userId); // Send message to socket server
+    setTyping(false);
+  };
+
+  const sendMessage = (text) => {
+    const taskblazePattern = /@?(taskblaze|task|blaze)/gi; // Match @task, @blaze, @taskblaze (case-insensitive)
+  
+    if (/(task|blaze)/i.test(text)) {
+      const cleanedText = text.replace(taskblazePattern, '').trim(); // Remove keyword and clean up
+      AIsendMessage(cleanedText); // Send to AI without keywords
+    } else {
+      handleSendMessage(text); // Regular socket message
+    }
+  };
+  
+
+  // AI message send function
+  const AIsendMessage = async (text) => {
     if (!text.trim()) return;
 
-    setMessages([...messages, { sender: "user", text }]);
+    setMessages((prev) => [...prev, { sender: "user", text }]);
     setInput("");
     setTyping(true);
 
@@ -21,11 +66,6 @@ export default function ChatUI() {
       const response = await axios.post("http://127.0.0.1:8000/chat", {
         message: text,
       });
-
-      const extractedThinkText =
-        response.data.response
-          .match(/<think[^>]*>(.*?)<\/think>/gis)
-          ?.map((match) => match.replace(/<\/?think[^>]*>/gi, "").trim()) || [];
 
       const cleanedMessage = response.data.response
         .replace(/<think[^>]*>.*?<\/think>/gis, "")
@@ -47,11 +87,35 @@ export default function ChatUI() {
     }
   };
 
+  // Listen for new socket messages and update state accordingly
+  useEffect(() => {
+    if (socketMessages.length > 0) {
+      console.log("Socket message received:", socketMessages.at(-1));
+      if(socketMessages.at(-1).user !== userId) {
+        setMessages((prev) => [
+          ...prev,
+          { sender: "Sender", text: socketMessages.at(-1).message },
+        ]);
+      }
+      
+      // setMessages((prev) => [
+      //   ...prev,
+      //   { sender: "Sender", text: socketMessages.at(-1) },
+      // ]);
+    }
+  }, [socketMessages]);
+
   return (
-    <div className="chatpage flex w-full bg-gray-900 text-white relative h-screen" style={{ height: 'calc(100vh - 64px)' }}>
+    <div
+      className="chatpage flex w-full bg-gray-900 text-white relative h-screen"
+      style={{ height: "calc(100vh - 64px)" }}
+    >
       <section className="hidden sm:block sm:w-1/5 flex-1 border-x-2 border-gray-700 overflow-y-auto">
         {new Array(100).fill(null).map((_, index) => (
-          <div key={index} className="flex items-center border-b-2 border-gray-700 px-2 py-3 cursor-pointer hover:bg-gray-800 gap-2">
+          <div
+            key={index}
+            className="flex items-center border-b-2 border-gray-700 px-2 py-3 cursor-pointer hover:bg-gray-800 gap-2"
+          >
             <section>
               <img
                 src="https://i.ibb.co.com/Gx52yXp/19ca0976-b0c9-4c73-8230-fc9261eced81.jpg"
@@ -78,8 +142,40 @@ export default function ChatUI() {
       </section>
 
       <section className="hidden sm:block sm:w-1/5 border-x-2 border-gray-700 overflow-y-auto">
-        {/* Show the list of Task list of half */}
-        {/* Show the member if group inbox open, otherwise show all notifications */}
+        <div className="mb-4 p-4">
+          <label
+            htmlFor="roomId"
+            className="block text-sm font-medium text-gray-300"
+          >
+            Room ID :
+          </label>
+          <input
+            id="roomId"
+            name="roomId"
+            type="text"
+            onChange={(e) => setRoomId(e.target.value)}
+            className="w-full px-4 py-2 mt-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            placeholder="e.g. XXXXX"
+            required
+          />
+          <div className="flex justify-between mt-5">
+            <button onClick={() => joinRoom(roomId)} className="btn">
+              Join Room
+            </button>
+            <button
+              onClick={() => leaveRoom(roomId)}
+              className="btn bg-red-700 border-red-800 shadow-red-700 text-white"
+            >
+              Leave Room
+            </button>
+            <button
+              onClick={() => createRoom(roomId, userId)}
+              className="btn bg-green-700 border-green-800 shadow-green-700 text-white"
+            >
+              Create Room
+            </button>
+          </div>
+        </div>
       </section>
     </div>
   );
