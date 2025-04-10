@@ -1,5 +1,6 @@
-import { createBrowserRouter } from 'react-router-dom';
-import ChatContainer from './components/Chat/root';
+import { createBrowserRouter } from 'react-router';
+// import ChatContainer from './components/Chat/root';
+import ChatComponent from './components/Chat/Test';
 import Dashboard from './components/Dashboard/Dashboard';
 import { default as Kanban } from './components/Dashboard/Kanban';
 import Authnication from './Pages/Authnication';
@@ -25,10 +26,10 @@ let router = createBrowserRouter([
         path: '/kanban',
         element: <PrivateRoute><Kanban /></PrivateRoute>,
       },
-      {
-        path: '/ChatContainer',
-        element: <ChatContainer />,
-      },
+      // {
+      //   path: '/ChatContainer',
+      //   element: <ChatContainer />,
+      // },
     ],
 
   },
@@ -39,6 +40,10 @@ let router = createBrowserRouter([
   {
     path: '/user-credential',
     element: <Authnication />,  
+  },  
+  {
+    path: '/test',
+    element: <ChatComponent />,  
   },  
   
 ]);

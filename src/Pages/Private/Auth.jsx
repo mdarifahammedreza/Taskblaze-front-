@@ -1,7 +1,7 @@
-import { FacebookAuthProvider, GithubAuthProvider, GoogleAuthProvider, createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
+import { FacebookAuthProvider, GithubAuthProvider, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
+import auth from '../../../firebase.config';
 
 // Firebase Auth Setup
-const auth = getAuth();
 
 // Providers
 const facebookProvider = new FacebookAuthProvider();
