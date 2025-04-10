@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import useSocket from './socket'; // Import the custom hook
+import useSocket from './Socket';
+
 
 const ChatComponent = () => {
   const { messages, room, joinRoom, leaveRoom, sendMessage, createRoom } = useSocket();

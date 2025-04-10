@@ -5,6 +5,7 @@ import { io } from 'socket.io-client';
 // Initialize socket connection to the server
 const socket = io('http://localhost:5000');
 
+
 const useSocket = () => {
   const [messages, setMessages] = useState([]);
   const [room, setRoom] = useState(null);
