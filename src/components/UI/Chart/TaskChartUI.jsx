@@ -9,9 +9,11 @@ ChartJS.register(Title, Tooltip, Legend, CategoryScale, LinearScale, PointElemen
 
 export default function TaskChartUI() {
   const [tasks, setTasks] = useState([
-    { id: 1, name: "Task 1", deadline: "2025-04-10", finishDate: "2025-04-12" },
-    { id: 2, name: "Task 2", deadline: "2025-04-15", finishDate: "2025-04-14" },
-    { id: 3, name: "Task 3", deadline: "2025-04-20", finishDate: "2025-04-19" },
+    { id: 1, name: "Task 4", deadline: "2025-04-10", finishDate: "2025-04-12" },
+    { id: 2, name: "Task 5", deadline: "2025-04-15", finishDate: "2025-04-14" },
+    { id: 3, name: "Task 6", deadline: "2025-04-20", finishDate: "2025-04-19" },
+    { id: 4, name: "Task 7", deadline: "2025-04-10", finishDate: "2025-04-14" },
+    { id: 5, name: "Task 8 ", deadline: "2025-04-20", finishDate: "2025-04-14" },
   ]);
 
   const [activeness, setActiveness] = useState(0);

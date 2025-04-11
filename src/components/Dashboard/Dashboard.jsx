@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { UserContext } from "../../Pages/Private/AuthProvider";
 import PrivateRoute from "../../Pages/Private/Private";
 import TaskTimeChart from "../UI/Chart/BarChart";
 import TaskChartUI from "../UI/Chart/TaskChartUI";
+import TasksList from "./TaskList";
 
 const Dashboard = () => {
   const groupName = ["Design", "Development", "Marketing", "Management"];
+const {user} = useContext(UserContext)
 
   const [task, setTask] = useState({
     category: "",
@@ -14,7 +17,8 @@ const Dashboard = () => {
     rating: 0,
     deadline: "",
   });
-
+      
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setTask({
@@ -31,23 +35,46 @@ const Dashboard = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Submit task data (this could involve calling an API or updating state)
-    alert(`Task submitted: ${JSON.stringify(task)}`);
-    setTask({
-      category: "",
-      group: "",
-      content: "",
-      description: "",
-      rating: 0,
-      deadline: "",
-    });
-
-
-
+  
     
+    const token = user?.stsTokenManager?.accessToken;
+  
+    if (!token) {
+      alert("User not logged in or token missing");
+      return;
+    }
+  
+    try {
+      const response = await fetch("http://localhost:5000/api/tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(task),
+      });
+  console.log(response)
+      const data = await response.json();
+  
+      if (!response.ok) throw new Error(data.error || "Task creation failed");
+  
+      alert("Task created successfully");
+      setTask({
+        category: "",
+        group: "",
+        content: "",
+        description: "",
+        rating: 0,
+        deadline: "",
+      });
+    } catch (err) {
+      alert("Error: " + err.message);
+      console.error(err);
+    }
   };
+  
 
   return (
     <PrivateRoute>
@@ -68,7 +95,8 @@ const Dashboard = () => {
             <p className="text-justify p-4 border-b-2 border-gray-700  text-gray-300 bg-gray-900 sticky top-0 z-10">
               Pending Tasks
             </p>
-            <ul className="list-decimal list-inside text-left mt-4 p-4   space-y-4">
+            <TasksList task={task}/>
+            {/* <ul className="list-decimal list-inside text-left mt-4 p-4   space-y-4">
               <li className=" border-2 border-gray-700  rounded-lg px-2 py-1">
                 {" "}
                 <span>Track your tasks and time spent. </span>{" "}
@@ -225,7 +253,7 @@ const Dashboard = () => {
                   </button>
                 </span>
               </li>
-            </ul>
+            </ul> */}
           </div>
 
           <div className="w-full md:w-1/2  m p-6 rounded-lg shadow-lg  text-white bg-gray-900 h-[43rem]">
