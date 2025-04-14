@@ -7,6 +7,7 @@ export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [work, setWork] = useState(null); // State to hold the task data
 
   // Load user from localStorage on mount
   useEffect(() => {
@@ -53,7 +54,7 @@ export const UserProvider = ({ children }) => {
   }
 
   return (
-    <UserContext.Provider value={{ user, setUser, login, logout }}>
+    <UserContext.Provider value={{ work,setWork,user, setUser, login, logout }}>
       {children}
     </UserContext.Provider>
   );

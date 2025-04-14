@@ -12,7 +12,9 @@ const useSocket = () => {
   // Function to join a room
   const joinRoom = (roomId) => {
     socket.emit('joinRoom', roomId);
+    
     setRoom(roomId);
+    
     console.log(`Joined room: ${roomId}`);
   };
 

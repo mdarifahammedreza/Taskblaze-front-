@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import { UserContext } from "../../Pages/Private/AuthProvider";
 import PrivateRoute from "../../Pages/Private/Private";
 import TaskTimeChart from "../UI/Chart/BarChart";
@@ -7,7 +8,7 @@ import TasksList from "./TaskList";
 
 const Dashboard = () => {
   const groupName = ["Design", "Development", "Marketing", "Management"];
-const {user} = useContext(UserContext)
+const {user,setWork} = useContext(UserContext)
 
   const [task, setTask] = useState({
     category: "",
@@ -59,8 +60,8 @@ const {user} = useContext(UserContext)
       const data = await response.json();
   
       if (!response.ok) throw new Error(data.error || "Task creation failed");
-  
-      alert("Task created successfully");
+      toast.success('Task created successfully')
+     
       setTask({
         category: "",
         group: "",
@@ -80,7 +81,7 @@ const {user} = useContext(UserContext)
     <PrivateRoute>
       <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gray-800 py-6 px-4">
         <h1 className="text-3xl font-bold text-white mb-6">Dashboard</h1>
-
+<Toaster position="top-center" reverseOrder={false} />
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-screen-xl mb-6">
           <div className="border-2 border-gray-700 rounded-lg overflow-hidden">
             <TaskChartUI />
@@ -95,7 +96,7 @@ const {user} = useContext(UserContext)
             <p className="text-justify p-4 border-b-2 border-gray-700  text-gray-300 bg-gray-900 sticky top-0 z-10">
               Pending Tasks
             </p>
-            <TasksList task={task}/>
+            <TasksList task={task}setWork={setWork}/>
             {/* <ul className="list-decimal list-inside text-left mt-4 p-4   space-y-4">
               <li className=" border-2 border-gray-700  rounded-lg px-2 py-1">
                 {" "}

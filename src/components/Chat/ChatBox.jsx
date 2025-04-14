@@ -1,6 +1,7 @@
 // components/ChatBox.jsx
 import { useEffect, useRef } from "react";
-import { FaMicrophone, FaRobot, FaUser } from "react-icons/fa";
+import toast from "react-hot-toast";
+import { FaMicrophone, FaRobot, FaUser, FaUserSecret } from "react-icons/fa";
 import { TextGenerateEffect } from "./Text-Generate-Effect";
 
 export default function ChatBox({
@@ -39,7 +40,7 @@ export default function ChatBox({
             }`}
           >
             {msg.sender === "ai" && <FaRobot className="text-cyan-400" />}
-            {msg.sender === "sender" && <FaUser className="text-cyan-400" />}
+            {msg.sender === "sender" && <FaUserSecret className="text-cyan-200" />}
             <div
               className={`px-4 py-2 rounded-lg max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg animate-fade-in ${
                 msg.sender === "user"
@@ -57,7 +58,7 @@ export default function ChatBox({
           <div className="flex items-center space-x-3 justify-start">
             <FaRobot className="text-cyan-400" />
             <div className="px-4 py-2 rounded-lg max-w-xs bg-gray-800 text-gray-300 animate-pulse">
-              Typing...
+              Thinking...
             </div>
           </div>
         )}
@@ -75,14 +76,15 @@ export default function ChatBox({
             placeholder="Type a message..."
           />
           <button
-            onClick={() => sendMessage(input)}
+            onClick={() =>{ input ? sendMessage(input) : toast.error("Please type a message") }}
             className="px-2 md:px-6 md:py-3 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600"
+            
           >
             Send
           </button>
           <button className="px-2 md:px-4 md:py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600">
             <FaMicrophone />
-          </button>
+          </button >
         </div>
       </div>
     </div>

@@ -12,15 +12,15 @@ import Root from './Root';
 let router = createBrowserRouter([
   {
     path: '/',
-    element: <Root />,
+    element: <PrivateRoute><Root /></PrivateRoute>,
     children: [
       {
         path: '/',
-        element: <Dashboard />,
+        element: <PrivateRoute><Dashboard /></PrivateRoute>,
       },
       {
         path: '/chat',
-        element: <Chat />,
+        element: <PrivateRoute><Chat /></PrivateRoute>,
       },
       {
         path: '/kanban',

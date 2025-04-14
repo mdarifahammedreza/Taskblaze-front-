@@ -1,9 +1,10 @@
 import axios from "axios";
-import { useState, useEffect, useContext } from "react";
+import { useContext, useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { UserContext } from "../../Pages/Private/AuthProvider";
 import ChatBox from "./ChatBox";
 import useSocket from "./Socket";
 import { TextGenerateEffect } from "./Text-Generate-Effect";
-import { UserContext } from "../../Pages/Private/AuthProvider";
 export default function ChatUI() {
   const { user } = useContext(UserContext);
   useEffect(() => {
@@ -44,15 +45,14 @@ export default function ChatUI() {
 
   const sendMessage = (text) => {
     const taskblazePattern = /@?(taskblaze|task|blaze)/gi; // Match @task, @blaze, @taskblaze (case-insensitive)
-  
+
     if (/(task|blaze)/i.test(text)) {
-      const cleanedText = text.replace(taskblazePattern, '').trim(); // Remove keyword and clean up
+      const cleanedText = text.replace(taskblazePattern, "").trim(); // Remove keyword and clean up
       AIsendMessage(cleanedText); // Send to AI without keywords
     } else {
       handleSendMessage(text); // Regular socket message
     }
   };
-  
 
   // AI message send function
   const AIsendMessage = async (text) => {
@@ -91,13 +91,13 @@ export default function ChatUI() {
   useEffect(() => {
     if (socketMessages.length > 0) {
       console.log("Socket message received:", socketMessages.at(-1));
-      if(socketMessages.at(-1).user !== userId) {
+      if (socketMessages.at(-1).user !== userId) {
         setMessages((prev) => [
           ...prev,
-          { sender: "Sender", text: socketMessages.at(-1).message },
+          { sender: "sender", text: socketMessages.at(-1).message },
         ]);
       }
-      
+
       // setMessages((prev) => [
       //   ...prev,
       //   { sender: "Sender", text: socketMessages.at(-1) },
@@ -111,7 +111,7 @@ export default function ChatUI() {
       style={{ height: "calc(100vh - 64px)" }}
     >
       <section className="hidden sm:block sm:w-1/5 flex-1 border-x-2 border-gray-700 overflow-y-auto">
-        {new Array(100).fill(null).map((_, index) => (
+        {new Array(1).fill(null).map((_, index) => (
           <div
             key={index}
             className="flex items-center border-b-2 border-gray-700 px-2 py-3 cursor-pointer hover:bg-gray-800 gap-2"
@@ -124,13 +124,13 @@ export default function ChatUI() {
               />
             </section>
             <section className="flex flex-col leading-[10px]">
-              <p>Md Arif Ahammed Reza</p>
+              <p>Samsuzzuha Shihab</p>
               <p className="text-sm overflow-hidden">Last Message show</p>
             </section>
           </div>
         ))}
       </section>
-
+      <Toaster position="top-center" reverseOrder={false} />
       <section className="w-full sm:w-3/5 overflow-y-auto">
         <ChatBox
           messages={messages}
@@ -159,17 +159,21 @@ export default function ChatUI() {
             required
           />
           <div className="flex justify-between mt-5">
-            <button onClick={() => joinRoom(roomId)} className="btn">
+            <button onClick={() => {joinRoom(roomId) ;
+              toast.success(`Successfully Join in ${roomId}`)}} className="btn">
               Join Room
             </button>
             <button
-              onClick={() => leaveRoom(roomId)}
+              onClick={() => {leaveRoom(roomId);
+                toast.success(`Successfully Leave from ${roomId}`)}}
               className="btn bg-red-700 border-red-800 shadow-red-700 text-white"
             >
               Leave Room
             </button>
             <button
-              onClick={() => createRoom(roomId, userId)}
+              onClick={() => {createRoom(roomId, userId);
+                toast.success(`Successfully Crate room  ${roomId}` );
+                toast.success(`Successfully Join in ${roomId}` )}}
               className="btn bg-green-700 border-green-800 shadow-green-700 text-white"
             >
               Create Room

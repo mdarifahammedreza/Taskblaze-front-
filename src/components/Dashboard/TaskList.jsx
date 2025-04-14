@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { UserContext } from "../../Pages/Private/AuthProvider";
 
 const TasksList = ({task}) => {
+  const {user,setWork} = useContext(UserContext)
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -10,7 +13,7 @@ const TasksList = ({task}) => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const user = JSON.parse(localStorage.getItem('user'));
+        // const user = JSON.parse(localStorage.getItem('user'));
         const token = user?.stsTokenManager?.accessToken;
 
         if (!token) {
@@ -25,16 +28,24 @@ const TasksList = ({task}) => {
             Authorization: `Bearer ${token}`,
           },
         });
+        if(res.statusText==="Unauthorized"){
+          
+          localStorage.removeItem("user");
+          }
 
         if (!res.ok) throw new Error('Failed to fetch tasks');
         const data = await res.json();
         
         setTasks(data);
+        setWork(data); // Set the work state with the fetched tasks
         console.log(data)
         setLoading(false);
       } catch (err) {
         setError(err.message);
+        console.error(err);
         setLoading(false);
+        // err.code===401 &&  localStorage.removeItem("user");
+
       }
     };
 
@@ -44,7 +55,7 @@ const TasksList = ({task}) => {
   // Handle task deletion
   const deleteTask = async (taskId) => {
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
+      // const user = JSON.parse(localStorage.getItem('user'));
       const token = user?.stsTokenManager?.accessToken;
 
       if (!token) {
@@ -63,6 +74,7 @@ const TasksList = ({task}) => {
       
       // Remove the deleted task from the state
       setTasks(tasks.filter((task) => task._id !== taskId));
+      toast.success('Task deleted successfully!');
     } catch (err) {
       setError(err.message);
     }
@@ -112,7 +124,8 @@ const TasksList = ({task}) => {
         )
       );
 
-      closeModal(); // Close the modal after successful submission
+      closeModal();
+      toast.success("Task updated Success") // Close the modal after successful submission
     } catch (err) {
       setError(err.message);
     }
@@ -124,7 +137,7 @@ const TasksList = ({task}) => {
   return (
     <div>
       <div>
-       
+       <Toaster position="top-center" reverseOrder={false} />
         <ul className="list-decimal list-inside text-left mt-4 p-4 space-y-4">
           {tasks.map((task) => (
             <li key={task._id} className="border-2 border-gray-700 rounded-lg px-2 py-1">
